@@ -1,16 +1,16 @@
 import React from 'react';
-import { 
+import {
   Menu,
-  Sun, 
-  Moon, 
-  TrendingUp, 
-  AlertTriangle, 
-  Database, 
-  ChevronRight, 
-  FileSpreadsheet, 
+  Sun,
+  Moon,
+  TrendingUp,
+  AlertTriangle,
+  Database,
+  ChevronRight,
+  FileSpreadsheet,
   LogOut,
   ShoppingBag,
-  Shield
+  Wallet
 } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 import { isOwner } from '../utils/cryptoAuth';
@@ -26,6 +26,7 @@ export default function Header({
   currentUser,
   onLogout,
   onOpenMobile,
+  onNavigateTab,
   onExportBackup,
   onExportReport
 }) {
@@ -33,115 +34,208 @@ export default function Header({
 
   const getTabTitle = () => {
     switch (activeTab) {
-      case 'pos': return 'POS Billing Counter';
-      case 'inventory': return 'Inventory & Stock Management';
-      case 'dues': return 'Customer Due (Baki Khata)';
-      case 'reports': return 'Financial Analytics & Profit';
-      case 'settings': return 'Store Settings & Staff';
-      default: return 'Dashboard';
+      case 'pos':
+        return 'POS Billing Terminal';
+      case 'inventory':
+        return 'Inventory & Stock';
+      case 'dues':
+        return 'Baki Khata (Dues)';
+      case 'reports':
+        return 'Executive Analytics';
+      case 'settings':
+        return 'Settings & Staff';
+      default:
+        return 'Dashboard';
     }
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 transition-colors no-print">
-      <div className="px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        
-        {/* Left: Mobile Toggle & Breadcrumb */}
-        <div className="flex items-center space-x-3">
+    <header
+      className="sticky top-0 z-30 w-full backdrop-blur-xl border-b transition-colors no-print"
+      style={{
+        backgroundColor: 'color-mix(in srgb, var(--bg-canvas) 88%, transparent)',
+        borderColor: 'var(--border-hairline)'
+      }}
+    >
+      <div className="px-4 sm:px-5 h-14 flex items-center justify-between gap-3">
+        {/* Left: Mobile Menu & Breadcrumb */}
+        <div className="flex items-center gap-2.5 min-w-0">
           <button
+            type="button"
             onClick={onOpenMobile}
-            className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+            className="lg:hidden p-2 rounded-xl transition-colors hover:bg-[var(--bg-hover)] shrink-0"
+            style={{ color: 'var(--text-secondary)' }}
             aria-label="Open navigation menu"
           >
-            <Menu className="w-5 h-5" />
+            <Menu className="w-5 h-5" strokeWidth={1.75} />
           </button>
 
-          <div className="flex items-center space-x-1.5 text-xs">
-            <span className="font-semibold text-slate-400 hidden sm:inline">Store</span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400 hidden sm:inline" />
-            <h2 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white tracking-tight">
+          <div className="flex items-center gap-1.5 text-xs min-w-0">
+            <span
+              className="font-medium hidden sm:inline truncate"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              {config?.shopName || 'Store'}
+            </span>
+            <ChevronRight
+              className="w-3.5 h-3.5 hidden sm:inline shrink-0"
+              style={{ color: 'var(--text-muted)' }}
+              strokeWidth={1.75}
+            />
+            <h2
+              className="font-bold text-sm tracking-tight truncate"
+              style={{ color: 'var(--text-primary)' }}
+            >
               {getTabTitle()}
             </h2>
           </div>
         </div>
 
-        {/* Right: Role-Gated KPI Tickers, Export Button & User Controls */}
-        <div className="flex items-center space-x-2 sm:space-x-3">
-          
-          {/* Today's Ticker: Revenue (Owner only) vs Order Count (Staff) */}
+        {/* Right: 5-Second Rule Compact Shift Ticker + Actions */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {isUserOwner ? (
-            <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/80 text-xs">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span className="text-slate-500 dark:text-slate-400">Today's Sales:</span>
-              <span className="font-bold font-mono text-emerald-600 dark:text-emerald-400">
-                {formatCurrency(analytics.todayRevenue)}
+            <div
+              className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-lg border text-[11px]"
+              style={{
+                backgroundColor: 'var(--bg-surface)',
+                borderColor: 'var(--border-hairline)'
+              }}
+            >
+              <span className="flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} strokeWidth={1.9} />
+                <span style={{ color: 'var(--text-muted)' }}>Sales</span>
+                <span className="font-mono font-bold" style={{ color: 'var(--text-primary)' }}>
+                  {formatCurrency(analytics.todayRevenue)}
+                </span>
+              </span>
+              <span className="w-px h-3.5" style={{ backgroundColor: 'var(--border-hairline)' }} />
+              <span className="flex items-center gap-1.5">
+                <Wallet className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} strokeWidth={1.9} />
+                <span style={{ color: 'var(--text-muted)' }}>Profit</span>
+                <span className="font-mono font-bold" style={{ color: 'var(--accent)' }}>
+                  +{formatCurrency(analytics.todayProfit)}
+                </span>
               </span>
             </div>
           ) : (
-            <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
-              <ShoppingBag className="w-3.5 h-3.5 text-slate-500" />
-              <span className="text-slate-500 dark:text-slate-400">Today:</span>
-              <span className="font-bold font-mono text-slate-900 dark:text-white">
-                {analytics.todaySalesCount} orders logged
+            <div
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px]"
+              style={{
+                backgroundColor: 'var(--bg-surface)',
+                borderColor: 'var(--border-hairline)'
+              }}
+            >
+              <ShoppingBag className="w-3.5 h-3.5" style={{ color: 'var(--text-secondary)' }} strokeWidth={1.75} />
+              <span style={{ color: 'var(--text-muted)' }}>Shift Orders</span>
+              <span className="font-mono font-bold" style={{ color: 'var(--text-primary)' }}>
+                {analytics.todaySalesCount}
               </span>
             </div>
           )}
 
-          {/* Low Stock Badge */}
           {inventoryStats.lowStockCount > 0 && (
-            <div className="hidden md:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 text-xs font-semibold">
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
-              <span>{inventoryStats.lowStockCount} Low</span>
-            </div>
+            <button
+              type="button"
+              onClick={() => onNavigateTab && onNavigateTab('inventory')}
+              className="tactile-press hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-opacity hover:opacity-90"
+              style={{
+                backgroundColor: 'var(--warning-soft)',
+                color: 'var(--warning)'
+              }}
+              title="View low stock items in Inventory"
+            >
+              <AlertTriangle className="w-3.5 h-3.5" strokeWidth={1.9} />
+              <span className="font-mono">{inventoryStats.lowStockCount} Low</span>
+            </button>
           )}
 
-          {/* Export Report Excel (Owner Only) */}
+          {isUserOwner && duesSummary?.totalDuesBalance > 0 && (
+            <button
+              type="button"
+              onClick={() => onNavigateTab && onNavigateTab('dues')}
+              className="tactile-press hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-medium transition-colors hover:bg-[var(--bg-subtle)]"
+              style={{
+                backgroundColor: 'var(--bg-surface)',
+                borderColor: 'var(--border-hairline)',
+                color: 'var(--text-secondary)'
+              }}
+              title="Open Baki Khata"
+            >
+              <span>Baki</span>
+              <span className="font-mono font-bold" style={{ color: 'var(--danger)' }}>
+                {formatCurrency(duesSummary.totalDuesBalance)}
+              </span>
+            </button>
+          )}
+
           {isUserOwner && onExportReport && (
             <button
+              type="button"
               onClick={onExportReport}
-              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center space-x-1.5 shadow-sm transition cursor-pointer"
+              className="tactile-press px-3 py-1.5 rounded-lg text-white font-semibold text-[11px] flex items-center gap-1.5 transition-colors"
+              style={{ backgroundColor: 'var(--accent)' }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--accent-hover)')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--accent)')}
               title="Download Sales Report (.xlsx)"
             >
-              <FileSpreadsheet className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Export Report</span>
+              <FileSpreadsheet className="w-3.5 h-3.5" strokeWidth={1.85} />
+              <span className="hidden sm:inline">Export</span>
             </button>
           )}
 
-          {/* Backup Button (Owner Only) */}
           {isUserOwner && (
             <button
+              type="button"
               onClick={onExportBackup}
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              className="tactile-press w-8 h-8 rounded-lg border flex items-center justify-center transition-colors hover:bg-[var(--bg-hover)]"
+              style={{
+                backgroundColor: 'var(--bg-surface)',
+                borderColor: 'var(--border-hairline)',
+                color: 'var(--text-secondary)'
+              }}
               title="Download Store Backup (JSON)"
+              aria-label="Download Store Backup"
             >
-              <Database className="w-4 h-4" />
+              <Database className="w-3.5 h-3.5" strokeWidth={1.75} />
             </button>
           )}
 
-          {/* Theme Toggle */}
           <button
+            type="button"
             onClick={() => setDarkMode(!darkMode)}
-            className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition"
-            title={darkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+            className="tactile-press w-8 h-8 rounded-lg border flex items-center justify-center transition-colors hover:bg-[var(--bg-hover)]"
+            style={{
+              backgroundColor: 'var(--bg-surface)',
+              borderColor: 'var(--border-hairline)',
+              color: 'var(--text-secondary)'
+            }}
+            title={darkMode ? 'Switch to Light Theme (F9)' : 'Switch to Dark Theme (F9)'}
+            aria-label={darkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
           >
-            {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+            {darkMode ? (
+              <Sun className="w-3.5 h-3.5" style={{ color: 'var(--warning)' }} strokeWidth={1.75} />
+            ) : (
+              <Moon className="w-3.5 h-3.5" strokeWidth={1.75} />
+            )}
           </button>
 
-          {/* User Avatar & Logout */}
           {currentUser && (
-            <div className="flex items-center space-x-1 pl-1 border-l border-slate-200 dark:border-slate-800">
-              <button
-                onClick={onLogout}
-                className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition"
-                title={`Signed in as ${currentUser.fullName} (${currentUser.role}). Click to Logout.`}
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={onLogout}
+              className="tactile-press w-8 h-8 rounded-lg border flex items-center justify-center transition-colors hover:bg-[var(--danger-soft)] hover:text-[var(--danger)]"
+              style={{
+                backgroundColor: 'var(--bg-surface)',
+                borderColor: 'var(--border-hairline)',
+                color: 'var(--text-muted)'
+              }}
+              title={`Signed in as ${currentUser.fullName} (${currentUser.role}). Click to Logout.`}
+              aria-label="Sign Out"
+            >
+              <LogOut className="w-3.5 h-3.5" strokeWidth={1.75} />
+            </button>
           )}
-
         </div>
-
       </div>
     </header>
   );

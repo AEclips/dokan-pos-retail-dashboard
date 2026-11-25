@@ -1,20 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Store, 
-  Database, 
-  Download, 
-  Upload, 
-  RotateCcw, 
-  Sparkles, 
-  Check, 
-  Users, 
-  UserPlus, 
-  Trash2, 
-  ShieldCheck, 
-  KeyRound,
-  AlertCircle
+import {
+  Store,
+  Database,
+  Download,
+  Upload,
+  RotateCcw,
+  Sparkles,
+  Check,
+  Users,
+  UserPlus,
+  Trash2,
+  AlertCircle,
+  Crown,
+  User
 } from 'lucide-react';
-import { getAllStaffAccounts, deleteStaffAccount, registerUser, isOwner } from '../../utils/cryptoAuth';
+import {
+  getAllStaffAccounts,
+  deleteStaffAccount,
+  registerUser,
+  isOwner
+} from '../../utils/cryptoAuth';
 
 export default function SettingsScreen({
   config,
@@ -33,7 +38,6 @@ export default function SettingsScreen({
   const [receiptFooter, setReceiptFooter] = useState(config.receiptFooter || '');
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  // Staff Account Management (Owner Only)
   const isUserOwner = isOwner(currentUser);
   const [staffAccounts, setStaffAccounts] = useState([]);
   const [newStaffName, setNewStaffName] = useState('');
@@ -97,7 +101,7 @@ export default function SettingsScreen({
       setNewStaffName('');
       setNewStaffEmail('');
       setNewStaffPassword('');
-      setStaffSuccess(`Added ${newStaffRole} account successfully!`);
+      setStaffSuccess(`Added ${newStaffRole} account successfully.`);
       setTimeout(() => setStaffSuccess(null), 3000);
     } catch (err) {
       setStaffError(err.message || 'Failed to add staff account.');
@@ -118,98 +122,129 @@ export default function SettingsScreen({
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto animate-fade-in">
-      
-      {/* ==================== STAFF MANAGEMENT (OWNER ONLY) ==================== */}
+    <div className="space-y-6 max-w-4xl mx-auto animate-soft-enter">
+      {/* Staff Management (Owner Only) */}
       {isUserOwner && (
-        <div className="saas-card p-6 sm:p-7 space-y-5 bg-white dark:bg-slate-900 border border-purple-200/80 dark:border-purple-900/50">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-            <div className="flex items-center space-x-2.5">
-              <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300">
-                <Users className="w-5 h-5" />
+        <div className="pos-surface p-6 sm:p-7 space-y-5">
+          <div
+            className="flex items-center justify-between pb-3.5 border-b"
+            style={{ borderColor: 'var(--border-hairline)' }}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                style={{ backgroundColor: 'var(--accent-soft)', color: 'var(--accent)' }}
+              >
+                <Users className="w-4 h-4" strokeWidth={1.75} />
               </div>
               <div>
-                <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+                <h2 className="text-sm sm:text-base font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                   <span>Staff & Role Access Control</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-800">
+                  <span
+                    className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                    style={{ backgroundColor: 'var(--accent-soft)', color: 'var(--accent)' }}
+                  >
                     Owner Only
                   </span>
                 </h2>
-                <p className="text-xs text-slate-400">
-                  Manage staff credentials, assign roles (Owner vs Staff), and revoke access
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                  Manage staff credentials, assign Owner/Staff roles, and revoke access
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Feedback alerts */}
           {staffError && (
-            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center space-x-2">
-              <AlertCircle className="w-4 h-4" />
+            <div
+              className="p-3 rounded-xl text-xs flex items-center gap-2"
+              style={{ backgroundColor: 'var(--danger-soft)', color: 'var(--danger)' }}
+            >
+              <AlertCircle className="w-4 h-4 shrink-0" strokeWidth={1.75} />
               <span>{staffError}</span>
             </div>
           )}
 
           {staffSuccess && (
-            <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs flex items-center space-x-2">
-              <Check className="w-4 h-4" />
+            <div
+              className="p-3 rounded-xl text-xs flex items-center gap-2"
+              style={{ backgroundColor: 'var(--accent-soft)', color: 'var(--accent)' }}
+            >
+              <Check className="w-4 h-4 shrink-0" strokeWidth={1.75} />
               <span>{staffSuccess}</span>
             </div>
           )}
 
-          {/* Add Staff Form */}
-          <form onSubmit={handleCreateStaff} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 text-xs">
-            <div className="font-bold text-slate-900 dark:text-white flex items-center space-x-1.5">
-              <UserPlus className="w-4 h-4 text-emerald-600" />
+          <form
+            onSubmit={handleCreateStaff}
+            className="p-4 rounded-xl border space-y-3 text-xs"
+            style={{
+              backgroundColor: 'var(--bg-subtle)',
+              borderColor: 'var(--border-hairline)'
+            }}
+          >
+            <div className="font-semibold flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
+              <UserPlus className="w-4 h-4" style={{ color: 'var(--accent)' }} strokeWidth={1.75} />
               <span>Create New Staff Account</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
               <div>
-                <label className="block font-medium mb-1 text-slate-600 dark:text-slate-400">Full Name</label>
+                <label className="block font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
+                  Full Name
+                </label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Rahat Karim"
                   value={newStaffName}
                   onChange={(e) => setNewStaffName(e.target.value)}
-                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white"
+                  className="pos-input w-full px-3 py-2 text-xs font-medium"
+                  style={{ backgroundColor: 'var(--bg-surface)' }}
                 />
               </div>
 
               <div>
-                <label className="block font-medium mb-1 text-slate-600 dark:text-slate-400">Email Address</label>
+                <label className="block font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
+                  Email Address
+                </label>
                 <input
                   type="email"
                   required
                   placeholder="staff2@dokanpos.com"
                   value={newStaffEmail}
                   onChange={(e) => setNewStaffEmail(e.target.value)}
-                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white"
+                  className="pos-input w-full px-3 py-2 text-xs font-medium"
+                  style={{ backgroundColor: 'var(--bg-surface)' }}
                 />
               </div>
 
               <div>
-                <label className="block font-medium mb-1 text-slate-600 dark:text-slate-400">Password</label>
+                <label className="block font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
+                  Password
+                </label>
                 <input
                   type="password"
                   required
                   placeholder="••••••••"
                   value={newStaffPassword}
                   onChange={(e) => setNewStaffPassword(e.target.value)}
-                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono dark:text-white"
+                  className="pos-input w-full px-3 py-2 text-xs font-mono"
+                  style={{ backgroundColor: 'var(--bg-surface)' }}
                 />
               </div>
 
               <div>
-                <label className="block font-medium mb-1 text-slate-600 dark:text-slate-400">Role</label>
+                <label className="block font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
+                  Role
+                </label>
                 <select
                   value={newStaffRole}
                   onChange={(e) => setNewStaffRole(e.target.value)}
-                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white"
+                  className="pos-input w-full px-3 py-2 text-xs font-medium"
+                  style={{ backgroundColor: 'var(--bg-surface)' }}
                 >
-                  <option value="Staff">Staff (POS & Stock Only)</option>
-                  <option value="Owner">Owner (Full Admin Access)</option>
+                  <option value="Staff">Staff (POS & Stock)</option>
+                  <option value="Owner">Owner (Full Admin)</option>
                 </select>
               </div>
             </div>
@@ -217,59 +252,84 @@ export default function SettingsScreen({
             <div className="flex justify-end pt-1">
               <button
                 type="submit"
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition shadow-sm cursor-pointer"
+                className="tactile-press px-4 py-2 rounded-xl text-white font-semibold text-xs transition-colors"
+                style={{ backgroundColor: 'var(--accent)' }}
               >
                 + Add Staff Account
               </button>
             </div>
           </form>
 
-          {/* Existing Accounts List */}
           <div className="space-y-2">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Active User Accounts ({staffAccounts.length})
+            <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+              Active Accounts ({staffAccounts.length})
             </div>
 
-            <div className="divide-y divide-slate-100 dark:divide-slate-800 border rounded-xl overflow-hidden">
+            <div
+              className="border rounded-xl overflow-hidden [&>*+*]:border-t [&>*+*]:border-[var(--border-hairline)]"
+              style={{ borderColor: 'var(--border-hairline)' }}
+            >
               {staffAccounts.map((acc) => {
                 const isCurrent = acc.id === currentUser?.id;
+                const isAccOwner = acc.role === 'Owner';
                 return (
-                  <div key={acc.id} className="p-3 bg-white dark:bg-slate-900/60 flex items-center justify-between gap-3 text-xs">
-                    <div className="flex items-center space-x-3 min-w-0">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
-                        acc.role === 'Owner' ? 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300' : 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                      }`}>
-                        {acc.role === 'Owner' ? '👑' : '👤'}
+                  <div
+                    key={acc.id}
+                    className="p-3 flex items-center justify-between gap-3 text-xs"
+                    style={{ backgroundColor: 'var(--bg-surface)' }}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                        style={{
+                          backgroundColor: isAccOwner ? 'var(--accent-soft)' : 'var(--bg-subtle)',
+                          color: isAccOwner ? 'var(--accent)' : 'var(--text-secondary)'
+                        }}
+                      >
+                        {isAccOwner ? (
+                          <Crown className="w-4 h-4" strokeWidth={1.75} />
+                        ) : (
+                          <User className="w-4 h-4" strokeWidth={1.75} />
+                        )}
                       </div>
                       <div className="truncate">
-                        <div className="font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+                        <div className="font-semibold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                           <span>{acc.fullName}</span>
                           {isCurrent && (
-                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 font-normal">
+                            <span
+                              className="text-[10px] px-1.5 py-0.2 rounded-full font-medium"
+                              style={{ backgroundColor: 'var(--bg-subtle)', color: 'var(--text-muted)' }}
+                            >
                               You
                             </span>
                           )}
                         </div>
-                        <div className="text-[11px] text-slate-400 font-mono">
+                        <div className="text-[11px] font-mono" style={{ color: 'var(--text-muted)' }}>
                           {acc.email}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-3 shrink-0">
-                      <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${
-                        acc.role === 'Owner' ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800' : 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
-                      }`}>
+                    <div className="flex items-center gap-2.5 shrink-0">
+                      <span
+                        className="px-2.5 py-0.5 rounded-full font-semibold text-[10px]"
+                        style={{
+                          backgroundColor: isAccOwner ? 'var(--accent-soft)' : 'var(--bg-subtle)',
+                          color: isAccOwner ? 'var(--accent)' : 'var(--text-secondary)'
+                        }}
+                      >
                         {acc.role}
                       </span>
 
                       {!isCurrent && (
                         <button
+                          type="button"
                           onClick={() => handleDeleteStaff(acc)}
-                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition"
+                          className="tactile-press p-1.5 rounded-lg transition-colors hover:bg-[var(--danger-soft)] hover:text-[var(--danger)]"
+                          style={{ color: 'var(--text-muted)' }}
                           title="Delete Staff Account"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
                         </button>
                       )}
                     </div>
@@ -278,30 +338,36 @@ export default function SettingsScreen({
               })}
             </div>
           </div>
-
         </div>
       )}
 
       {/* Shop Profile Form */}
-      <div className="saas-card p-6 sm:p-7 space-y-5">
-        
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center space-x-2.5">
-            <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
-              <Store className="w-5 h-5" />
+      <div className="pos-surface p-6 sm:p-7 space-y-5">
+        <div
+          className="flex items-center justify-between pb-3.5 border-b"
+          style={{ borderColor: 'var(--border-hairline)' }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+              style={{ backgroundColor: 'var(--bg-subtle)', color: 'var(--text-primary)' }}
+            >
+              <Store className="w-4 h-4" strokeWidth={1.75} />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+              <h2 className="text-sm sm:text-base font-bold" style={{ color: 'var(--text-primary)' }}>
                 Shop Profile & Thermal Header
               </h2>
-              <p className="text-xs text-slate-400">These details appear at the top of POS receipts</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                Printed at the top of 58mm POS receipts
+              </p>
             </div>
           </div>
 
           {savedSuccess && (
-            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center space-x-1">
-              <Check className="w-4 h-4" />
-              <span>Saved!</span>
+            <span className="text-xs font-semibold flex items-center gap-1" style={{ color: 'var(--accent)' }}>
+              <Check className="w-4 h-4" strokeWidth={2} />
+              <span>Saved</span>
             </span>
           )}
         </div>
@@ -309,103 +375,110 @@ export default function SettingsScreen({
         <form onSubmit={handleSaveConfig} className="space-y-4 text-xs">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block font-semibold mb-1.5" style={{ color: 'var(--text-secondary)' }}>
                 Shop Name (দোকানের নাম)
               </label>
               <input
                 type="text"
                 value={shopName}
                 onChange={(e) => setShopName(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold dark:text-white focus:outline-none focus:ring-1 focus:ring-slate-400"
+                className="pos-input w-full px-3 py-2 text-xs font-semibold"
               />
             </div>
             <div>
-              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block font-semibold mb-1.5" style={{ color: 'var(--text-secondary)' }}>
                 Tagline / Slogan
               </label>
               <input
                 type="text"
                 value={tagline}
                 onChange={(e) => setTagline(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white"
+                className="pos-input w-full px-3 py-2 text-xs font-medium"
               />
             </div>
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block font-semibold mb-1.5" style={{ color: 'var(--text-secondary)' }}>
               Shop Address (ঠিকানা)
             </label>
             <input
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white"
+              className="pos-input w-full px-3 py-2 text-xs font-medium"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block font-semibold mb-1.5" style={{ color: 'var(--text-secondary)' }}>
                 Contact Phone
               </label>
               <input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono dark:text-white"
+                className="pos-input w-full px-3 py-2 text-xs font-mono"
               />
             </div>
             <div>
-              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block font-semibold mb-1.5" style={{ color: 'var(--text-secondary)' }}>
                 bKash / Nagad Wallet
               </label>
               <input
                 type="text"
                 value={bkashNumber}
                 onChange={(e) => setBkashNumber(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono dark:text-white"
+                className="pos-input w-full px-3 py-2 text-xs font-mono"
               />
             </div>
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block font-semibold mb-1.5" style={{ color: 'var(--text-secondary)' }}>
               Receipt Footer Note
             </label>
             <input
               type="text"
               value={receiptFooter}
               onChange={(e) => setReceiptFooter(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-medium dark:text-white"
+              className="pos-input w-full px-3 py-2 text-xs font-medium"
             />
           </div>
 
           <div className="pt-2 flex justify-end">
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-bold text-xs shadow-sm hover:opacity-90 transition cursor-pointer"
+              className="tactile-press px-5 py-2.5 rounded-xl font-semibold text-xs transition-opacity hover:opacity-90"
+              style={{ backgroundColor: 'var(--text-primary)', color: 'var(--bg-surface)' }}
             >
               Save Profile Changes
             </button>
           </div>
         </form>
-
       </div>
 
       {/* Database Backup & Maintenance (Owner Only) */}
       {isUserOwner && (
-        <div className="saas-card p-6 sm:p-7 space-y-5">
-          
-          <div className="flex items-center space-x-2.5 pb-3 border-b border-slate-100 dark:border-slate-800">
-            <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
-              <Database className="w-5 h-5" />
+        <div className="pos-surface p-6 sm:p-7 space-y-5">
+          <div
+            className="flex items-center gap-3 pb-3.5 border-b"
+            style={{ borderColor: 'var(--border-hairline)' }}
+          >
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+              style={{ backgroundColor: 'var(--bg-subtle)', color: 'var(--text-primary)' }}
+            >
+              <Database className="w-4 h-4" strokeWidth={1.75} />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+              <h2 className="text-sm sm:text-base font-bold" style={{ color: 'var(--text-primary)' }}>
                 Data Backup & Offline Storage
               </h2>
-              <p className="text-xs text-slate-400">Export timestamped JSON backups for 100% offsite safety</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                Export timestamped JSON backups for offsite safety
+              </p>
             </div>
           </div>
 
@@ -418,71 +491,95 @@ export default function SettingsScreen({
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            
-            {/* Export */}
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
+            <div
+              className="p-4 rounded-xl border flex flex-col justify-between gap-3"
+              style={{
+                backgroundColor: 'var(--bg-subtle)',
+                borderColor: 'var(--border-hairline)'
+              }}
+            >
               <div>
-                <div className="font-bold text-slate-900 dark:text-white flex items-center space-x-1.5">
-                  <Download className="w-4 h-4 text-emerald-500" />
+                <div className="font-semibold flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
+                  <Download className="w-4 h-4" style={{ color: 'var(--accent)' }} strokeWidth={1.75} />
                   <span>Export Store Backup (.JSON)</span>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Saves complete product catalog, all sales invoices, and customer dues.
+                <p className="text-[11px] mt-1" style={{ color: 'var(--text-muted)' }}>
+                  Saves product catalog, sales invoices, and customer dues.
                 </p>
               </div>
               <button
+                type="button"
                 onClick={onExportBackup}
-                className="py-2 px-3 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs transition flex items-center justify-center space-x-1.5 shadow-sm"
+                className="tactile-press py-2 px-3 rounded-lg font-semibold text-xs flex items-center justify-center gap-1.5"
+                style={{ backgroundColor: 'var(--text-primary)', color: 'var(--bg-surface)' }}
               >
-                <Download className="w-3.5 h-3.5" />
+                <Download className="w-3.5 h-3.5" strokeWidth={1.75} />
                 <span>Download Backup</span>
               </button>
             </div>
 
-            {/* Import */}
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
+            <div
+              className="p-4 rounded-xl border flex flex-col justify-between gap-3"
+              style={{
+                backgroundColor: 'var(--bg-subtle)',
+                borderColor: 'var(--border-hairline)'
+              }}
+            >
               <div>
-                <div className="font-bold text-slate-900 dark:text-white flex items-center space-x-1.5">
-                  <Upload className="w-4 h-4 text-blue-500" />
+                <div className="font-semibold flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
+                  <Upload className="w-4 h-4" style={{ color: 'var(--text-secondary)' }} strokeWidth={1.75} />
                   <span>Restore Store Database</span>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1">
+                <p className="text-[11px] mt-1" style={{ color: 'var(--text-muted)' }}>
                   Upload a previous DokanPOS backup JSON file to restore records.
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="py-2 px-3 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-bold text-xs transition flex items-center justify-center space-x-1.5"
+                className="tactile-press py-2 px-3 rounded-lg border font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-[var(--bg-hover)]"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  borderColor: 'var(--border-hairline)',
+                  color: 'var(--text-primary)'
+                }}
               >
-                <Upload className="w-3.5 h-3.5" />
+                <Upload className="w-3.5 h-3.5" strokeWidth={1.75} />
                 <span>Select File</span>
               </button>
             </div>
-
           </div>
 
-          {/* Demo & Reset */}
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div
+            className="pt-3 border-t flex flex-wrap items-center justify-between gap-3 text-xs"
+            style={{ borderColor: 'var(--border-hairline)' }}
+          >
             <button
+              type="button"
               onClick={onResetDemoData}
-              className="px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold flex items-center space-x-1.5 transition"
+              className="tactile-press px-3.5 py-1.5 rounded-lg border font-medium flex items-center gap-1.5 transition-colors hover:bg-[var(--bg-hover)]"
+              style={{
+                backgroundColor: 'var(--bg-subtle)',
+                borderColor: 'var(--border-hairline)',
+                color: 'var(--text-secondary)'
+              }}
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <Sparkles className="w-3.5 h-3.5" style={{ color: 'var(--warning)' }} strokeWidth={1.75} />
               <span>Load BD Gadgets Demo Data</span>
             </button>
 
             <button
+              type="button"
               onClick={onResetAllData}
-              className="px-3.5 py-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-bold flex items-center space-x-1.5 transition"
+              className="tactile-press px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-colors hover:bg-[var(--danger-soft)]"
+              style={{ color: 'var(--danger)' }}
             >
-              <RotateCcw className="w-3.5 h-3.5" />
+              <RotateCcw className="w-3.5 h-3.5" strokeWidth={1.75} />
               <span>Clear Store & Reset</span>
             </button>
           </div>
-
         </div>
       )}
-
     </div>
   );
 }

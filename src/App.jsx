@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Check } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import AuthScreen from './components/auth/AuthScreen';
@@ -83,11 +84,10 @@ export default function App() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [flatDiscount, setFlatDiscount] = useState(0);
+  const [preferredPaymentMethod, setPreferredPaymentMethod] = useState('cash');
 
   const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem('dokanpos_theme');
-    if (saved) return saved === 'dark';
-    return false; // Default light for clean SaaS look
+    return localStorage.getItem('dokanpos_theme') !== 'light';
   });
 
   // Modals
@@ -233,6 +233,7 @@ export default function App() {
   const handleClearCart = () => {
     setCartItems([]);
     setFlatDiscount(0);
+    setPreferredPaymentMethod('cash');
   };
 
   // ==================== SALES COMPLETION ====================
@@ -369,6 +370,12 @@ export default function App() {
     showToast('Exported backup JSON!');
   };
 
+  const handleExportReport = () => {
+    if (exportSalesToExcel(sales, config?.shopName || 'DokanPOS')) {
+      showToast('Exported sales report to Excel!');
+    }
+  };
+
   const handleImportBackup = async (file) => {
     try {
       const data = await parseBackupFile(file);
@@ -415,7 +422,14 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex text-slate-900 dark:text-slate-100 selection:bg-slate-900 selection:text-white dark:selection:bg-white dark:selection:text-slate-900">
+    <div
+      className={
+        activeTab === 'pos'
+          ? 'min-h-screen lg:h-screen lg:overflow-hidden flex'
+          : 'min-h-screen flex'
+      }
+      style={{ backgroundColor: 'var(--bg-canvas)', color: 'var(--text-primary)' }}
+    >
       
       {/* Left Sidebar Navigation (Desktop Fixed + Mobile Overlay) */}
       <Sidebar
@@ -430,8 +444,14 @@ export default function App() {
         onCloseMobile={() => setIsMobileNavOpen(false)}
       />
 
-      {/* Main Workspace Area (Offset by 64 on large screens) */}
-      <div className="flex-1 flex flex-col min-w-0 lg:pl-64">
+      {/* Main Workspace Area */}
+      <div
+        className={
+          activeTab === 'pos'
+            ? 'flex-1 flex flex-col min-w-0 lg:h-screen lg:overflow-hidden'
+            : 'flex-1 flex flex-col min-w-0'
+        }
+      >
         
         {/* Top Header */}
         <Header
@@ -445,17 +465,30 @@ export default function App() {
           currentUser={currentUser}
           onLogout={handleLogout}
           onOpenMobile={() => setIsMobileNavOpen(true)}
+          onNavigateTab={handleTabChange}
           onExportBackup={handleExportBackup}
           onExportReport={handleExportReport}
         />
 
         {/* Content Body */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <main
+          className={
+            activeTab === 'pos'
+              ? 'flex-1 min-w-0 min-h-0 lg:overflow-hidden'
+              : 'flex-1 p-4 sm:p-6 lg:p-7 max-w-[1440px] w-full mx-auto'
+          }
+        >
           
           {/* Toast Notification */}
           {toastMessage && (
-            <div className="fixed bottom-6 right-6 z-50 animate-fade-in bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold text-xs px-4 py-2.5 rounded-xl shadow-lg flex items-center space-x-2 border border-slate-700/50 no-print">
-              <span>✨</span>
+            <div
+              className="fixed bottom-5 right-5 z-50 animate-soft-enter font-medium text-xs px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 no-print"
+              style={{
+                backgroundColor: 'var(--text-primary)',
+                color: 'var(--bg-surface)'
+              }}
+            >
+              <Check className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--accent)' }} strokeWidth={2.25} />
               <span>{toastMessage}</span>
             </div>
           )}
@@ -466,6 +499,12 @@ export default function App() {
               cartItems={cartItems}
               cartTotals={cartTotals}
               flatDiscount={flatDiscount}
+              analytics={salesAnalytics}
+              inventoryStats={inventoryStats}
+              duesSummary={duesSummary}
+              currentUser={currentUser}
+              preferredPaymentMethod={preferredPaymentMethod}
+              onSelectPaymentMethod={setPreferredPaymentMethod}
               onSetFlatDiscount={setFlatDiscount}
               onAddToCart={handleAddToCart}
               onUpdateCartQty={handleUpdateCartQty}
@@ -544,6 +583,7 @@ export default function App() {
         cartItems={cartItems}
         cartTotals={cartTotals}
         flatDiscount={flatDiscount}
+        initialPaymentMethod={preferredPaymentMethod}
         config={config}
         dues={dues}
         onCompleteSale={handleCompleteSale}

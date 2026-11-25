@@ -4,98 +4,203 @@
 
 :root {
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  
-  /* Linear / Notion SaaS Neutral Canvas */
-  --bg-app: #f8fafc;
-  --surface-card: #ffffff;
-  --surface-sidebar: #ffffff;
-  --border-subtle: #e2e8f0;
-  --border-strong: #cbd5e1;
-  
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --text-dim: #94a3b8;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Studio Porcelain (Light Mode) */
+  --bg-canvas: #F5F6F8;
+  --bg-sidebar: #FFFFFF;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #F8F9FB;
+  --bg-subtle: #EFF1F5;
+  --bg-hover: #E5E8EF;
+
+  --border-hairline: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.16);
+
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+
+  --accent: #059669;
+  --accent-hover: #047857;
+  --accent-soft: rgba(5, 150, 105, 0.11);
+
+  --warning: #D97706;
+  --warning-soft: rgba(217, 119, 6, 0.12);
+
+  --danger: #E11D48;
+  --danger-soft: rgba(225, 29, 72, 0.11);
+
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 20px -12px rgba(15, 23, 42, 0.08);
+  --shadow-modal: 0 24px 60px -12px rgba(15, 23, 42, 0.24), 0 0 0 1px rgba(15, 23, 42, 0.06);
+  --specular: rgba(255, 255, 255, 0.9);
 }
 
 .dark {
-  --bg-app: #090d16;
-  --surface-card: #0f172a;
-  --surface-sidebar: #0b1120;
-  --border-subtle: #1e293b;
-  --border-strong: #334155;
-  
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --text-dim: #64748b;
+  /* Obsidian Carbon (Default Retail Terminal) */
+  --bg-canvas: #09090B;
+  --bg-sidebar: #0D0E11;
+  --bg-surface: #121418;
+  --bg-elevated: #181B21;
+  --bg-subtle: #1D2129;
+  --bg-hover: #252A34;
+
+  --border-hairline: rgba(255, 255, 255, 0.075);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #A1A7B3;
+  --text-muted: #6E7685;
+
+  --accent: #10B981;
+  --accent-hover: #059669;
+  --accent-soft: rgba(16, 185, 129, 0.14);
+
+  --warning: #F59E0B;
+  --warning-soft: rgba(245, 158, 11, 0.14);
+
+  --danger: #F43F5E;
+  --danger-soft: rgba(244, 63, 94, 0.14);
+
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.45), 0 12px 28px -14px rgba(0, 0, 0, 0.7);
+  --shadow-modal: 0 28px 70px -12px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.09);
+  --specular: rgba(255, 255, 255, 0.045);
 }
 
 @layer base {
+  html {
+    font-family: var(--font-sans);
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
     font-family: var(--font-sans);
-    background-color: var(--bg-app);
-    color: var(--text-main);
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
     min-height: 100vh;
     transition: background-color 0.2s ease, color 0.2s ease;
     overflow-x: hidden;
   }
+
+  ::selection {
+    background-color: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 }
 
-/* Clean SaaS Card Panel (Linear / Notion style) */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Layered Hardware Surface Card */
+.pos-surface,
 .saas-card {
-  background-color: var(--surface-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 1rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card), inset 0 1px 0 var(--specular);
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease, background-color 0.16s ease;
 }
 
-.saas-card:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+.pos-surface-interactive:hover {
+  background-color: var(--bg-elevated);
+  border-color: var(--border-strong);
 }
 
-/* Linear / Notion subtle badge */
-.badge-clean {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.1875rem 0.5rem;
-  border-radius: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+/* Inset Terminal Readout */
+.terminal-display {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-hairline);
+  box-shadow: inset 0 1px 0 var(--specular);
 }
 
-/* Micro-interaction transitions */
+.pos-input {
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-primary);
+  border-radius: 10px;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pos-input:focus {
+  outline: none;
+  background-color: var(--bg-surface);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.tactile-press {
+  transition: transform 0.1s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.tactile-press:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+@keyframes softEnter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-soft-enter,
 .animate-fade-in {
-  animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: softEnter 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .animate-soft-enter,
+  .animate-fade-in {
+    animation: none;
+  }
+  .tactile-press:active:not(:disabled) {
+    transform: none;
+  }
 }
 
-/* Subtle scrollbars */
+/* Auth Left Panel Architectural Grid */
+.auth-grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+/* Subtle Scrollbars */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.3);
+  background: rgba(148, 163, 184, 0.22);
   border-radius: 9999px;
 }
-
-.dark ::-webkit-scrollbar-thumb {
-  background: rgba(51, 65, 85, 0.5);
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.42);
 }
 
-/* Thermal POS Print Media Queries */
+/* Thermal POS Print Media Queries (58mm Receipt) */
 @media print {
   body {
     background: white !important;
