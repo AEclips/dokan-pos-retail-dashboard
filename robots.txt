@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://aeclips.github.io/dokan-pos-retail-dashboard/sitemap.xml

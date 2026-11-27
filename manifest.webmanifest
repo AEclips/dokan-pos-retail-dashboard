@@ -1,0 +1,19 @@
+{
+  "name": "DokanPOS — Retail Inventory & Billing Terminal",
+  "short_name": "DokanPOS",
+  "description": "Fast offline-ready retail POS, Baki Khata, thermal receipt printing, and analytics terminal for Bangladesh shops.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#09090B",
+  "background_color": "#09090B",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
