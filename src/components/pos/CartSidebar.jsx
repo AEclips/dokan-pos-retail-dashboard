@@ -13,7 +13,6 @@ import {
   UserPlus,
   PauseCircle,
   Play,
-  Hash,
   X
 } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
@@ -34,7 +33,6 @@ export default function CartSidebar({
   flatDiscount,
   onSetFlatDiscount,
   onUpdateQty,
-  onUpdateSerial,
   onRemoveItem,
   onClearCart,
   onOpenCheckout,
@@ -49,7 +47,6 @@ export default function CartSidebar({
   onRetrieveParkedOrder,
   onDeleteParkedOrder
 }) {
-  const [editingSerialId, setEditingSerialId] = useState(null);
   const [showHeldList, setShowHeldList] = useState(false);
 
   const isCartEmpty = cartItems.length === 0;
@@ -271,7 +268,7 @@ export default function CartSidebar({
         </div>
       )}
 
-      {/* Middle: Scrollable Line Items with Inline IMEI / SN */}
+      {/* Middle: Scrollable Line Items */}
       <div className="flex-1 min-h-[110px] overflow-y-auto px-4 py-2.5">
         {isCartEmpty ? (
           <div className="h-full min-h-[170px] flex flex-col items-center justify-center text-center gap-2 px-4">
@@ -296,124 +293,85 @@ export default function CartSidebar({
           </div>
         ) : (
           <div className="space-y-2">
-            {cartItems.map((item) => {
-              const isEditingSerial = editingSerialId === item.productId;
-              return (
-                <div
-                  key={item.productId}
-                  className="p-2.5 rounded-xl border space-y-1.5 text-xs"
-                  style={{
-                    backgroundColor: 'var(--bg-elevated)',
-                    borderColor: 'var(--border-hairline)'
-                  }}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold truncate flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
-                        <span className="truncate">{item.name}</span>
-                        {item.isCustom && (
-                          <span
-                            className="px-1.5 py-0.2 rounded text-[9px] font-mono uppercase shrink-0"
-                            style={{ backgroundColor: 'var(--accent-soft)', color: 'var(--accent)' }}
-                          >
-                            Custom
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[11px] font-mono mt-0.5">
-                        <span style={{ color: 'var(--text-muted)' }}>
-                          {formatCurrency(item.sellingPrice)} × {item.quantity}
-                        </span>
-                        <span style={{ color: 'var(--text-muted)' }}>=</span>
-                        <span className="font-bold" style={{ color: 'var(--accent)' }}>
-                          {formatCurrency(item.sellingPrice * item.quantity)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-1 shrink-0">
-                      <div
-                        className="inline-flex items-center rounded-lg border h-7"
-                        style={{
-                          backgroundColor: 'var(--bg-surface)',
-                          borderColor: 'var(--border-hairline)'
-                        }}
+            {cartItems.map((item) => (
+              <div
+                key={item.productId}
+                className="p-2.5 rounded-xl border flex items-center justify-between gap-2 text-xs"
+                style={{
+                  backgroundColor: 'var(--bg-elevated)',
+                  borderColor: 'var(--border-hairline)'
+                }}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold truncate flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
+                    <span className="truncate">{item.name}</span>
+                    {item.isCustom && (
+                      <span
+                        className="px-1.5 py-0.2 rounded text-[9px] font-mono uppercase shrink-0"
+                        style={{ backgroundColor: 'var(--accent-soft)', color: 'var(--accent)' }}
                       >
-                        <button
-                          type="button"
-                          onClick={() => onUpdateQty(item.productId, item.quantity - 1)}
-                          aria-label="Decrease quantity"
-                          className="tactile-press w-6 h-full flex items-center justify-center rounded-l-lg hover:bg-[var(--bg-hover)]"
-                          style={{ color: 'var(--text-secondary)' }}
-                        >
-                          <Minus className="w-3 h-3" strokeWidth={2.2} />
-                        </button>
-                        <span
-                          className="w-6 text-center font-mono font-bold text-[11px]"
-                          style={{ color: 'var(--text-primary)' }}
-                        >
-                          {item.quantity}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => onUpdateQty(item.productId, item.quantity + 1)}
-                          disabled={!item.isCustom && item.quantity >= item.stockQuantity}
-                          aria-label="Increase quantity"
-                          className="tactile-press w-6 h-full flex items-center justify-center rounded-r-lg hover:bg-[var(--bg-hover)] disabled:opacity-30"
-                          style={{ color: 'var(--text-secondary)' }}
-                        >
-                          <Plus className="w-3 h-3" strokeWidth={2.2} />
-                        </button>
-                      </div>
+                        Custom
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] font-mono mt-0.5">
+                    <span style={{ color: 'var(--text-muted)' }}>
+                      {formatCurrency(item.sellingPrice)} × {item.quantity}
+                    </span>
+                    <span style={{ color: 'var(--text-muted)' }}>=</span>
+                    <span className="font-bold" style={{ color: 'var(--accent)' }}>
+                      {formatCurrency(item.sellingPrice * item.quantity)}
+                    </span>
+                  </div>
+                </div>
 
-                      <button
-                        type="button"
-                        onClick={() => onRemoveItem(item.productId)}
-                        aria-label="Remove item"
-                        className="tactile-press w-6 h-7 rounded-lg flex items-center justify-center transition-colors opacity-65 hover:opacity-100 hover:bg-[var(--danger-soft)] hover:text-[var(--danger)]"
-                        style={{ color: 'var(--text-muted)' }}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
-                      </button>
-                    </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <div
+                    className="inline-flex items-center rounded-lg border h-7"
+                    style={{
+                      backgroundColor: 'var(--bg-surface)',
+                      borderColor: 'var(--border-hairline)'
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => onUpdateQty(item.productId, item.quantity - 1)}
+                      aria-label="Decrease quantity"
+                      className="tactile-press w-6 h-full flex items-center justify-center rounded-l-lg hover:bg-[var(--bg-hover)]"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      <Minus className="w-3 h-3" strokeWidth={2.2} />
+                    </button>
+                    <span
+                      className="w-6 text-center font-mono font-bold text-[11px]"
+                      style={{ color: 'var(--text-primary)' }}
+                    >
+                      {item.quantity}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => onUpdateQty(item.productId, item.quantity + 1)}
+                      disabled={!item.isCustom && item.quantity >= item.stockQuantity}
+                      aria-label="Increase quantity"
+                      className="tactile-press w-6 h-full flex items-center justify-center rounded-r-lg hover:bg-[var(--bg-hover)] disabled:opacity-30"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      <Plus className="w-3 h-3" strokeWidth={2.2} />
+                    </button>
                   </div>
 
-                  {/* Inline IMEI / Serial Tagging Row */}
-                  {onUpdateSerial && (
-                    <div className="flex items-center gap-1.5">
-                      {isEditingSerial ? (
-                        <input
-                          type="text"
-                          autoFocus
-                          placeholder="Enter IMEI or Serial No..."
-                          value={item.serialNumber || ''}
-                          onChange={(e) => onUpdateSerial(item.productId, e.target.value)}
-                          onBlur={() => setEditingSerialId(null)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === 'Escape') setEditingSerialId(null);
-                          }}
-                          className="pos-input w-full px-2 py-1 text-[10.5px] font-mono"
-                        />
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => setEditingSerialId(item.productId)}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[10px] font-mono transition-colors hover:bg-[var(--bg-hover)]"
-                          style={{
-                            backgroundColor: item.serialNumber ? 'var(--accent-soft)' : 'var(--bg-surface)',
-                            borderColor: item.serialNumber ? 'rgba(16, 185, 129, 0.3)' : 'var(--border-hairline)',
-                            color: item.serialNumber ? 'var(--accent)' : 'var(--text-muted)'
-                          }}
-                        >
-                          <Hash className="w-2.5 h-2.5" />
-                          <span>{item.serialNumber ? `SN: ${item.serialNumber}` : '+ IMEI / SN'}</span>
-                        </button>
-                      )}
-                    </div>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => onRemoveItem(item.productId)}
+                    aria-label="Remove item"
+                    className="tactile-press w-6 h-7 rounded-lg flex items-center justify-center transition-colors opacity-65 hover:opacity-100 hover:bg-[var(--danger-soft)] hover:text-[var(--danger)]"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
+                  </button>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         )}
       </div>

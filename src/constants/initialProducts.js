@@ -300,7 +300,6 @@ export const INITIAL_SAMPLE_SALES = [
         buyingPrice: 1750,
         sellingPrice: 2450,
         warranty: '1 Year Brand Warranty',
-        serialNumber: 'HVT-9024-8821',
         quantity: 2,
         itemDiscount: 0,
         total: 4900
@@ -363,7 +362,6 @@ export const INITIAL_SAMPLE_SALES = [
         buyingPrice: 2800,
         sellingPrice: 3650,
         warranty: '6 Months Replacement',
-        serialNumber: 'BAS-65W-4410',
         quantity: 1,
         itemDiscount: 0,
         total: 3650

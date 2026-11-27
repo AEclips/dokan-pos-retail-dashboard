@@ -16,8 +16,7 @@ export default function TransactionList({
       !q ||
       s.id.toLowerCase().includes(q) ||
       (s.customerName && s.customerName.toLowerCase().includes(q)) ||
-      (s.customerPhone && s.customerPhone.includes(q)) ||
-      (s.items && s.items.some((i) => i.serialNumber && i.serialNumber.toLowerCase().includes(q)));
+      (s.customerPhone && s.customerPhone.includes(q));
 
     const matchesMethod = selectedMethod === 'all' || s.paymentMethod === selectedMethod;
     return matchesSearch && matchesMethod;
@@ -48,7 +47,7 @@ export default function TransactionList({
             />
             <input
               type="text"
-              placeholder="Search invoice ID, customer, phone, or IMEI/SN..."
+              placeholder="Search invoice ID, customer name or phone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pos-input w-full pl-9 pr-3 py-2 text-xs font-medium"
@@ -106,23 +105,14 @@ export default function TransactionList({
                   </td>
                 </tr>
               ) : (
-                filteredSales.map((s) => {
-                  const serialList = (s.items || [])
-                    .map((i) => i.serialNumber)
-                    .filter(Boolean);
-                  return (
-                    <tr
-                      key={s.id}
-                      className="transition-colors hover:bg-[var(--bg-elevated)]"
-                    >
-                      <td className="py-3 px-4 font-mono font-bold" style={{ color: 'var(--text-primary)' }}>
-                        <div>{s.id}</div>
-                        {serialList.length > 0 && (
-                          <div className="text-[10px] font-normal mt-0.5" style={{ color: 'var(--accent)' }}>
-                            SN: {serialList[0]}
-                          </div>
-                        )}
-                      </td>
+                filteredSales.map((s) => (
+                  <tr
+                    key={s.id}
+                    className="transition-colors hover:bg-[var(--bg-elevated)]"
+                  >
+                    <td className="py-3 px-4 font-mono font-bold" style={{ color: 'var(--text-primary)' }}>
+                      {s.id}
+                    </td>
 
                       <td className="py-3 px-4 text-[11px] font-mono" style={{ color: 'var(--text-muted)' }}>
                         {formatDateTime(s.timestamp)}
@@ -189,8 +179,7 @@ export default function TransactionList({
                         </div>
                       </td>
                     </tr>
-                  );
-                })
+                ))
               )}
             </tbody>
           </table>

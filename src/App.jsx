@@ -218,7 +218,6 @@ export default function App() {
           buyingPrice: product.buyingPrice,
           stockQuantity: product.stockQuantity,
           warranty: product.warranty || '',
-          serialNumber: '',
           quantity: 1,
           itemDiscount: 0
         }
@@ -239,21 +238,12 @@ export default function App() {
         buyingPrice: parseFloat(buyingPrice) || 0,
         stockQuantity: 999,
         warranty: warranty.trim(),
-        serialNumber: '',
         quantity: 1,
         itemDiscount: 0,
         isCustom: true
       }
     ]);
     showToast(`Added custom item "${cleanName}"`);
-  };
-
-  const handleUpdateCartSerial = (productId, serialNumber) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.productId === productId ? { ...item, serialNumber } : item
-      )
-    );
   };
 
   const handleUndoLastCartItem = () => {
@@ -615,7 +605,6 @@ export default function App() {
               onAddToCart={handleAddToCart}
               onAddCustomSale={handleAddCustomSale}
               onUpdateCartQty={handleUpdateCartQty}
-              onUpdateCartSerial={handleUpdateCartSerial}
               onUndoLastCartItem={handleUndoLastCartItem}
               onParkOrder={handleParkOrder}
               onRetrieveParkedOrder={handleRetrieveParkedOrder}

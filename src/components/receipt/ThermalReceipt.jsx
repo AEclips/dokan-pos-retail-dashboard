@@ -68,10 +68,7 @@ export default function ThermalReceipt({
       `Date: ${formatDateTime(sale.timestamp)}`,
       `Customer: ${sale.customerName || 'Walk-in'}`,
       ...sale.items.map(
-        (i) =>
-          `${i.name} x${i.quantity} = ${formatCurrency(i.sellingPrice * i.quantity)}${
-            i.serialNumber ? ` [SN: ${i.serialNumber}]` : ''
-          }`
+        (i) => `${i.name} x${i.quantity} = ${formatCurrency(i.sellingPrice * i.quantity)}`
       ),
       `----------------------------`,
       `Grand Total: ${formatCurrency(sale.grandTotal)}`,
@@ -278,11 +275,6 @@ export default function ThermalReceipt({
                       {item.warranty && (
                         <div className="text-[8.5px] text-slate-600 mt-0.5">
                           Warranty: {item.warranty}
-                        </div>
-                      )}
-                      {item.serialNumber && (
-                        <div className="text-[8.5px] font-bold text-slate-800 mt-0.5">
-                          IMEI/SN: {item.serialNumber}
                         </div>
                       )}
                     </div>

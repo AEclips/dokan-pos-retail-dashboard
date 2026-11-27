@@ -31,7 +31,6 @@ export default function PosScreen({
   onAddToCart,
   onAddCustomSale,
   onUpdateCartQty,
-  onUpdateCartSerial,
   onUndoLastCartItem,
   onParkOrder,
   onRetrieveParkedOrder,
@@ -368,7 +367,6 @@ export default function PosScreen({
           flatDiscount={flatDiscount}
           onSetFlatDiscount={onSetFlatDiscount}
           onUpdateQty={onUpdateCartQty}
-          onUpdateSerial={onUpdateCartSerial}
           onRemoveItem={onRemoveCartItem}
           onClearCart={onClearCart}
           onOpenCheckout={onOpenCheckout}

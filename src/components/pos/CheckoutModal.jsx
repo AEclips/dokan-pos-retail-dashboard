@@ -81,7 +81,6 @@ export default function CheckoutModal({
         buyingPrice: item.buyingPrice,
         sellingPrice: item.sellingPrice,
         warranty: item.warranty || '',
-        serialNumber: (item.serialNumber || '').trim(),
         quantity: item.quantity,
         itemDiscount: item.itemDiscount || 0,
         total: item.sellingPrice * item.quantity - (item.itemDiscount || 0) * item.quantity
