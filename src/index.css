@@ -200,8 +200,12 @@
   background: rgba(148, 163, 184, 0.42);
 }
 
-/* Thermal POS Print Media Queries (58mm Receipt) */
+/* Thermal & A4 POS Print Media Queries */
 @media print {
+  @page {
+    margin: 4mm;
+  }
+
   body {
     background: white !important;
     color: black !important;
@@ -218,13 +222,29 @@
   }
 
   .printable-receipt-container {
-    width: 58mm !important;
-    max-width: 58mm !important;
     margin: 0 auto !important;
-    padding: 2mm !important;
     background: white !important;
     color: black !important;
     box-shadow: none !important;
     border: none !important;
+    border-radius: 0 !important;
+  }
+
+  .printable-receipt-container[data-paper="58mm"] {
+    width: 58mm !important;
+    max-width: 58mm !important;
+    padding: 2mm !important;
+  }
+
+  .printable-receipt-container[data-paper="80mm"] {
+    width: 80mm !important;
+    max-width: 80mm !important;
+    padding: 3mm !important;
+  }
+
+  .printable-receipt-container[data-paper="a4"] {
+    width: 100% !important;
+    max-width: 190mm !important;
+    padding: 8mm !important;
   }
 }

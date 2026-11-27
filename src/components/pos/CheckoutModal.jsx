@@ -21,6 +21,8 @@ export default function CheckoutModal({
   cartTotals,
   flatDiscount,
   initialPaymentMethod = 'cash',
+  initialCustomer = null,
+  currentUser,
   config,
   dues = [],
   onCompleteSale
@@ -45,8 +47,15 @@ export default function CheckoutModal({
       setSplitCash(cartTotals.grandTotal);
       setSplitBkash(0);
       setSplitDue(0);
+      if (initialCustomer) {
+        setCustomerName(initialCustomer.customerName || '');
+        setCustomerPhone(initialCustomer.customerPhone || '');
+      } else {
+        setCustomerName('');
+        setCustomerPhone('');
+      }
     }
-  }, [cartTotals.grandTotal, isOpen, initialPaymentMethod]);
+  }, [cartTotals.grandTotal, isOpen, initialPaymentMethod, initialCustomer]);
 
   if (!isOpen) return null;
 
@@ -71,6 +80,8 @@ export default function CheckoutModal({
         name: item.name,
         buyingPrice: item.buyingPrice,
         sellingPrice: item.sellingPrice,
+        warranty: item.warranty || '',
+        serialNumber: (item.serialNumber || '').trim(),
         quantity: item.quantity,
         itemDiscount: item.itemDiscount || 0,
         total: item.sellingPrice * item.quantity - (item.itemDiscount || 0) * item.quantity
@@ -89,7 +100,7 @@ export default function CheckoutModal({
         cashTendered: paymentMethod === 'cash' ? cashTendered : undefined,
         changeGiven: paymentMethod === 'cash' ? changeDue : undefined
       },
-      cashierName: 'Cashier'
+      cashierName: currentUser?.fullName || 'Cashier'
     };
 
     try {

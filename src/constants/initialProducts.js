@@ -287,6 +287,194 @@ export const INITIAL_SAMPLE_SALES = [
       dueAmount: 2600
     },
     cashierName: 'Manager'
+  },
+  {
+    id: 'INV-2026-0798',
+    timestamp: new Date(Date.now() - 86400000 * 1).toISOString(),
+    customerName: 'Nayeem Islam',
+    customerPhone: '01722-445566',
+    items: [
+      {
+        productId: 'prod-05',
+        name: 'Havit M9024 Bluetooth Calling Smartwatch',
+        buyingPrice: 1750,
+        sellingPrice: 2450,
+        warranty: '1 Year Brand Warranty',
+        serialNumber: 'HVT-9024-8821',
+        quantity: 2,
+        itemDiscount: 0,
+        total: 4900
+      }
+    ],
+    subtotal: 4900,
+    flatDiscount: 100,
+    grandTotal: 4800,
+    totalCost: 3500,
+    netProfit: 1300,
+    paymentMethod: 'bkash',
+    paymentDetails: { bkashAmount: 4800, bkashTrxId: 'BL981K4P9Q' },
+    cashierName: 'Shop Owner'
+  },
+  {
+    id: 'INV-2026-0794',
+    timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
+    customerName: 'Tanvir Hossain',
+    customerPhone: '01815-112233',
+    items: [
+      {
+        productId: 'prod-06',
+        name: 'Samsung 25W Type-C Super Fast Charging Adapter',
+        buyingPrice: 920,
+        sellingPrice: 1400,
+        warranty: '6 Months Replacement',
+        quantity: 2,
+        itemDiscount: 0,
+        total: 2800
+      },
+      {
+        productId: 'prod-07',
+        name: 'Baseus 100W Type-C to Type-C Braided Cable (2m)',
+        buyingPrice: 380,
+        sellingPrice: 650,
+        warranty: '6 Months Replacement',
+        quantity: 1,
+        itemDiscount: 0,
+        total: 650
+      }
+    ],
+    subtotal: 3450,
+    flatDiscount: 50,
+    grandTotal: 3400,
+    totalCost: 2220,
+    netProfit: 1180,
+    paymentMethod: 'cash',
+    paymentDetails: { cashAmount: 3400 },
+    cashierName: 'Shop Owner'
+  },
+  {
+    id: 'INV-2026-0790',
+    timestamp: new Date(Date.now() - 86400000 * 3).toISOString(),
+    customerName: 'Farhana Akter',
+    customerPhone: '01677-998811',
+    items: [
+      {
+        productId: 'prod-02',
+        name: 'Baseus Adaman 20000mAh 65W Metal Power Bank',
+        buyingPrice: 2800,
+        sellingPrice: 3650,
+        warranty: '6 Months Replacement',
+        serialNumber: 'BAS-65W-4410',
+        quantity: 1,
+        itemDiscount: 0,
+        total: 3650
+      },
+      {
+        productId: 'prod-08',
+        name: 'Realme Buds 2 Wired In-Ear Earphones (Deep Bass)',
+        buyingPrice: 390,
+        sellingPrice: 680,
+        warranty: '6 Months Brand Warranty',
+        quantity: 2,
+        itemDiscount: 0,
+        total: 1360
+      }
+    ],
+    subtotal: 5010,
+    flatDiscount: 110,
+    grandTotal: 4900,
+    totalCost: 3580,
+    netProfit: 1320,
+    paymentMethod: 'nagad',
+    paymentDetails: { bkashAmount: 0 },
+    cashierName: 'Shop Owner'
+  },
+  {
+    id: 'INV-2026-0785',
+    timestamp: new Date(Date.now() - 86400000 * 4).toISOString(),
+    customerName: 'Walk-in Customer',
+    customerPhone: '—',
+    items: [
+      {
+        productId: 'prod-01',
+        name: 'Anker 20W USB-C PowerPort III Fast Charger',
+        buyingPrice: 850,
+        sellingPrice: 1250,
+        warranty: '18 Months Official',
+        quantity: 2,
+        itemDiscount: 0,
+        total: 2500
+      }
+    ],
+    subtotal: 2500,
+    flatDiscount: 0,
+    grandTotal: 2500,
+    totalCost: 1700,
+    netProfit: 800,
+    paymentMethod: 'cash',
+    paymentDetails: { cashAmount: 2500 },
+    cashierName: 'Manager'
+  },
+  {
+    id: 'INV-2026-0781',
+    timestamp: new Date(Date.now() - 86400000 * 5).toISOString(),
+    customerName: 'Mehedi Hasan',
+    customerPhone: '01755-667788',
+    items: [
+      {
+        productId: 'prod-04',
+        name: 'Joyroom JR-T03S Pro ANC True Wireless Earbuds',
+        buyingPrice: 1950,
+        sellingPrice: 2650,
+        warranty: '6 Months Replacement',
+        quantity: 2,
+        itemDiscount: 0,
+        total: 5300
+      }
+    ],
+    subtotal: 5300,
+    flatDiscount: 200,
+    grandTotal: 5100,
+    totalCost: 3900,
+    netProfit: 1200,
+    paymentMethod: 'bkash',
+    paymentDetails: { bkashAmount: 5100, bkashTrxId: 'BL972M1X5Z' },
+    cashierName: 'Shop Owner'
+  },
+  {
+    id: 'INV-2026-0776',
+    timestamp: new Date(Date.now() - 86400000 * 6).toISOString(),
+    customerName: 'Sajib Mia',
+    customerPhone: '01911-223344',
+    items: [
+      {
+        productId: 'prod-09',
+        name: 'iPhone 15 Pro MagSafe Liquid Silicone Case',
+        buyingPrice: 280,
+        sellingPrice: 650,
+        warranty: 'Testing Warranty',
+        quantity: 3,
+        itemDiscount: 0,
+        total: 1950
+      },
+      {
+        productId: 'prod-03',
+        name: 'Remax Gition 3-in-1 Fast Charging Cable (1.2m)',
+        buyingPrice: 220,
+        sellingPrice: 420,
+        warranty: '3 Months Check Warranty',
+        quantity: 3,
+        itemDiscount: 0,
+        total: 1260
+      }
+    ],
+    subtotal: 3210,
+    flatDiscount: 60,
+    grandTotal: 3150,
+    totalCost: 1500,
+    netProfit: 1650,
+    paymentMethod: 'cash',
+    paymentDetails: { cashAmount: 3150 },
+    cashierName: 'Shop Owner'
   }
 ];
 

@@ -10,7 +10,8 @@ import {
   FileSpreadsheet,
   LogOut,
   ShoppingBag,
-  Wallet
+  Wallet,
+  Printer
 } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 import { isOwner } from '../utils/cryptoAuth';
@@ -27,6 +28,8 @@ export default function Header({
   onLogout,
   onOpenMobile,
   onNavigateTab,
+  lastSale,
+  onOpenLastReceipt,
   onExportBackup,
   onExportReport
 }) {
@@ -88,6 +91,17 @@ export default function Header({
             >
               {getTabTitle()}
             </h2>
+            <span
+              className="hidden xl:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold border ml-1.5"
+              style={{
+                backgroundColor: 'var(--accent-soft)',
+                borderColor: 'rgba(16, 185, 129, 0.24)',
+                color: 'var(--accent)'
+              }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--accent)' }} />
+              <span>Online</span>
+            </span>
           </div>
         </div>
 
@@ -165,6 +179,23 @@ export default function Header({
               <span className="font-mono font-bold" style={{ color: 'var(--danger)' }}>
                 {formatCurrency(duesSummary.totalDuesBalance)}
               </span>
+            </button>
+          )}
+
+          {lastSale && onOpenLastReceipt && (
+            <button
+              type="button"
+              onClick={onOpenLastReceipt}
+              className="tactile-press px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold flex items-center gap-1.5 transition-colors hover:bg-[var(--bg-hover)]"
+              style={{
+                backgroundColor: 'var(--bg-surface)',
+                borderColor: 'var(--border-hairline)',
+                color: 'var(--text-primary)'
+              }}
+              title={`Re-print Last Receipt (${lastSale.id})`}
+            >
+              <Printer className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} strokeWidth={1.85} />
+              <span className="hidden lg:inline">Last Receipt</span>
             </button>
           )}
 

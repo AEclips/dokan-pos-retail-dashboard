@@ -85,6 +85,21 @@ export default function App() {
   const [cartItems, setCartItems] = useState([]);
   const [flatDiscount, setFlatDiscount] = useState(0);
   const [preferredPaymentMethod, setPreferredPaymentMethod] = useState('cash');
+  const [selectedCartCustomer, setSelectedCartCustomer] = useState(null);
+  const [parkedOrders, setParkedOrders] = useState(() => {
+    try {
+      const saved = localStorage.getItem('dokanpos_parked_orders');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('dokanpos_parked_orders', JSON.stringify(parkedOrders));
+    } catch {}
+  }, [parkedOrders]);
 
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem('dokanpos_theme') !== 'light';
@@ -202,11 +217,93 @@ export default function App() {
           sellingPrice: product.sellingPrice,
           buyingPrice: product.buyingPrice,
           stockQuantity: product.stockQuantity,
+          warranty: product.warranty || '',
+          serialNumber: '',
           quantity: 1,
           itemDiscount: 0
         }
       ]);
     }
+  };
+
+  const handleAddCustomSale = ({ name, sellingPrice, buyingPrice = 0, warranty = '' }) => {
+    const cleanName = (name || '').trim();
+    const price = parseFloat(sellingPrice) || 0;
+    if (!cleanName || price <= 0) return;
+    setCartItems((prev) => [
+      ...prev,
+      {
+        productId: `custom-${Date.now()}`,
+        name: cleanName,
+        sellingPrice: price,
+        buyingPrice: parseFloat(buyingPrice) || 0,
+        stockQuantity: 999,
+        warranty: warranty.trim(),
+        serialNumber: '',
+        quantity: 1,
+        itemDiscount: 0,
+        isCustom: true
+      }
+    ]);
+    showToast(`Added custom item "${cleanName}"`);
+  };
+
+  const handleUpdateCartSerial = (productId, serialNumber) => {
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.productId === productId ? { ...item, serialNumber } : item
+      )
+    );
+  };
+
+  const handleUndoLastCartItem = () => {
+    if (cartItems.length === 0) return;
+    const last = cartItems[cartItems.length - 1];
+    if (last.quantity > 1) {
+      handleUpdateCartQty(last.productId, last.quantity - 1);
+    } else {
+      handleRemoveCartItem(last.productId);
+    }
+    showToast(`Undid ${last.name}`);
+  };
+
+  const handleParkOrder = () => {
+    if (cartItems.length === 0) {
+      showToast('Cart is empty. Nothing to hold.');
+      return;
+    }
+    const parked = {
+      id: `HOLD-${String(Date.now()).slice(-4)}`,
+      timestamp: new Date().toISOString(),
+      items: cartItems,
+      flatDiscount,
+      customer: selectedCartCustomer,
+      paymentMethod: preferredPaymentMethod,
+      total: cartTotals.grandTotal,
+      itemCount: cartTotals.totalItemCount
+    };
+    setParkedOrders((prev) => [parked, ...prev]);
+    setCartItems([]);
+    setFlatDiscount(0);
+    setSelectedCartCustomer(null);
+    setPreferredPaymentMethod('cash');
+    showToast(`Order ${parked.id} placed on hold`);
+  };
+
+  const handleRetrieveParkedOrder = (orderId) => {
+    const target = parkedOrders.find((o) => o.id === orderId);
+    if (!target) return;
+    setCartItems(target.items || []);
+    setFlatDiscount(target.flatDiscount || 0);
+    setSelectedCartCustomer(target.customer || null);
+    setPreferredPaymentMethod(target.paymentMethod || 'cash');
+    setParkedOrders((prev) => prev.filter((o) => o.id !== orderId));
+    showToast(`Restored held order ${target.id}`);
+  };
+
+  const handleDeleteParkedOrder = (orderId) => {
+    setParkedOrders((prev) => prev.filter((o) => o.id !== orderId));
+    showToast(`Removed held order ${orderId}`);
   };
 
   const handleUpdateCartQty = (productId, newQty) => {
@@ -233,6 +330,7 @@ export default function App() {
   const handleClearCart = () => {
     setCartItems([]);
     setFlatDiscount(0);
+    setSelectedCartCustomer(null);
     setPreferredPaymentMethod('cash');
   };
 
@@ -284,6 +382,8 @@ export default function App() {
     // 4. Reset Cart and open Receipt
     setCartItems([]);
     setFlatDiscount(0);
+    setSelectedCartCustomer(null);
+    setPreferredPaymentMethod('cash');
     setIsCheckoutOpen(false);
     setActiveReceiptSale(saleRecord);
 
@@ -466,17 +566,19 @@ export default function App() {
           onLogout={handleLogout}
           onOpenMobile={() => setIsMobileNavOpen(true)}
           onNavigateTab={handleTabChange}
+          lastSale={sales[0] || null}
+          onOpenLastReceipt={() => sales[0] && setActiveReceiptSale(sales[0])}
           onExportBackup={handleExportBackup}
           onExportReport={handleExportReport}
         />
 
         {/* Content Body */}
         <main
-          className={
+          className={`${
             activeTab === 'pos'
               ? 'flex-1 min-w-0 min-h-0 lg:overflow-hidden'
               : 'flex-1 p-4 sm:p-6 lg:p-7 max-w-[1440px] w-full mx-auto'
-          }
+          }${activeReceiptSale ? ' no-print' : ''}`}
         >
           
           {/* Toast Notification */}
@@ -502,12 +604,22 @@ export default function App() {
               analytics={salesAnalytics}
               inventoryStats={inventoryStats}
               duesSummary={duesSummary}
+              dues={dues}
               currentUser={currentUser}
               preferredPaymentMethod={preferredPaymentMethod}
+              selectedCartCustomer={selectedCartCustomer}
+              parkedOrders={parkedOrders}
               onSelectPaymentMethod={setPreferredPaymentMethod}
+              onSelectCartCustomer={setSelectedCartCustomer}
               onSetFlatDiscount={setFlatDiscount}
               onAddToCart={handleAddToCart}
+              onAddCustomSale={handleAddCustomSale}
               onUpdateCartQty={handleUpdateCartQty}
+              onUpdateCartSerial={handleUpdateCartSerial}
+              onUndoLastCartItem={handleUndoLastCartItem}
+              onParkOrder={handleParkOrder}
+              onRetrieveParkedOrder={handleRetrieveParkedOrder}
+              onDeleteParkedOrder={handleDeleteParkedOrder}
               onRemoveCartItem={handleRemoveCartItem}
               onClearCart={handleClearCart}
               onOpenCheckout={() => setIsCheckoutOpen(true)}
@@ -584,6 +696,8 @@ export default function App() {
         cartTotals={cartTotals}
         flatDiscount={flatDiscount}
         initialPaymentMethod={preferredPaymentMethod}
+        initialCustomer={selectedCartCustomer}
+        currentUser={currentUser}
         config={config}
         dues={dues}
         onCompleteSale={handleCompleteSale}
