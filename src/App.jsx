@@ -15,6 +15,13 @@ import ThermalReceipt from './components/receipt/ThermalReceipt';
 import SettingsScreen from './components/settings/SettingsScreen';
 
 import { loadStoreState, saveStoreState, exportBackupJson, parseBackupFile } from './utils/storage';
+import {
+  loadCloudConfig,
+  saveCloudConfig,
+  isCloudConfigured,
+  pushStoreToCloud,
+  pullStoreFromCloud
+} from './utils/cloudSync';
 import { exportSalesToExcel } from './utils/excelExport';
 import { getCurrentSession, clearCurrentSession, initializeDefaultUsers } from './utils/cryptoAuth';
 import { calculateCartTotals, calculateInventoryStats, calculateSalesAnalytics, calculateDuesSummary } from './utils/posCalculations';
@@ -115,6 +122,47 @@ export default function App() {
 
   // Toast notification
   const [toastMessage, setToastMessage] = useState(null);
+
+  // Live Network & Cloud Sync State
+  const [isOnline, setIsOnline] = useState(() =>
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+  const [cloudConfig, setCloudConfig] = useState(() => loadCloudConfig());
+  const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'syncing' | 'synced' | 'error'
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Persist local store state on changes
+  useEffect(() => {
+    saveStoreState({ products, sales, dues, config });
+  }, [products, sales, dues, config]);
+
+  // Debounced Cloud Auto-Sync when enabled & online
+  useEffect(() => {
+    if (!cloudConfig?.autoSync || !isCloudConfigured(cloudConfig) || !isOnline) return;
+    const timer = setTimeout(async () => {
+      try {
+        setSyncStatus('syncing');
+        const syncedAt = await pushStoreToCloud(cloudConfig, { products, sales, dues, config });
+        const next = { ...cloudConfig, lastSyncedAt: syncedAt };
+        setCloudConfig(next);
+        saveCloudConfig(next);
+        setSyncStatus('synced');
+      } catch {
+        setSyncStatus('error');
+      }
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [products, sales, dues, config, cloudConfig?.autoSync, isOnline]);
 
   useEffect(() => {
     if (darkMode) {
@@ -466,6 +514,56 @@ export default function App() {
     }
   };
 
+  const handleUpdateCloudConfig = (nextConfig) => {
+    setCloudConfig(nextConfig);
+    saveCloudConfig(nextConfig);
+    showToast('Saved Cloud Sync settings');
+  };
+
+  const handleCloudPush = async (overrideConfig) => {
+    const cfg = overrideConfig || cloudConfig;
+    if (!isOnline) {
+      showToast('You are offline. Connect to internet to sync.');
+      return;
+    }
+    try {
+      setSyncStatus('syncing');
+      const syncedAt = await pushStoreToCloud(cfg, { products, sales, dues, config });
+      const next = { ...cfg, lastSyncedAt: syncedAt };
+      setCloudConfig(next);
+      saveCloudConfig(next);
+      setSyncStatus('synced');
+      showToast('Synced store data to Cloud!');
+    } catch (err) {
+      setSyncStatus('error');
+      showToast(err.message || 'Cloud sync failed');
+    }
+  };
+
+  const handleCloudPull = async (overrideConfig) => {
+    const cfg = overrideConfig || cloudConfig;
+    if (!isOnline) {
+      showToast('You are offline. Connect to internet to pull.');
+      return;
+    }
+    try {
+      setSyncStatus('syncing');
+      const { payload, updatedAt } = await pullStoreFromCloud(cfg);
+      if (payload.products) setProducts(payload.products);
+      if (payload.sales) setSales(payload.sales);
+      if (payload.dues) setDues(payload.dues);
+      if (payload.config) setConfig(payload.config);
+      const next = { ...cfg, lastSyncedAt: updatedAt };
+      setCloudConfig(next);
+      saveCloudConfig(next);
+      setSyncStatus('synced');
+      showToast('Restored latest snapshot from Cloud!');
+    } catch (err) {
+      setSyncStatus('error');
+      showToast(err.message || 'Cloud pull failed');
+    }
+  };
+
   const handleImportBackup = async (file) => {
     try {
       const data = await parseBackupFile(file);
@@ -556,6 +654,10 @@ export default function App() {
           onLogout={handleLogout}
           onOpenMobile={() => setIsMobileNavOpen(true)}
           onNavigateTab={handleTabChange}
+          isOnline={isOnline}
+          cloudConfigured={isCloudConfigured(cloudConfig)}
+          syncStatus={syncStatus}
+          onQuickCloudSync={() => handleCloudPush()}
           lastSale={sales[0] || null}
           onOpenLastReceipt={() => sales[0] && setActiveReceiptSale(sales[0])}
           onExportBackup={handleExportBackup}
@@ -663,6 +765,12 @@ export default function App() {
             <SettingsScreen
               config={config}
               currentUser={currentUser}
+              cloudConfig={cloudConfig}
+              syncStatus={syncStatus}
+              isOnline={isOnline}
+              onUpdateCloudConfig={handleUpdateCloudConfig}
+              onCloudPush={handleCloudPush}
+              onCloudPull={handleCloudPull}
               onUpdateConfig={setConfig}
               onExportBackup={handleExportBackup}
               onImportBackup={handleImportBackup}

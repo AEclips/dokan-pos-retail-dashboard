@@ -11,7 +11,9 @@ import {
   LogOut,
   ShoppingBag,
   Wallet,
-  Printer
+  Printer,
+  Cloud,
+  WifiOff
 } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 import { isOwner } from '../utils/cryptoAuth';
@@ -28,6 +30,10 @@ export default function Header({
   onLogout,
   onOpenMobile,
   onNavigateTab,
+  isOnline = true,
+  cloudConfigured = false,
+  syncStatus = 'idle',
+  onQuickCloudSync,
   lastSale,
   onOpenLastReceipt,
   onExportBackup,
@@ -94,14 +100,40 @@ export default function Header({
             <span
               className="hidden xl:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold border ml-1.5"
               style={{
-                backgroundColor: 'var(--accent-soft)',
-                borderColor: 'rgba(16, 185, 129, 0.24)',
-                color: 'var(--accent)'
+                backgroundColor: isOnline ? 'var(--accent-soft)' : 'var(--warning-soft)',
+                borderColor: isOnline ? 'rgba(16, 185, 129, 0.24)' : 'rgba(245, 158, 11, 0.3)',
+                color: isOnline ? 'var(--accent)' : 'var(--warning)'
               }}
             >
-              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--accent)' }} />
-              <span>Online</span>
+              {isOnline ? (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--accent)' }} />
+                  <span>Online</span>
+                </>
+              ) : (
+                <>
+                  <WifiOff className="w-3 h-3" />
+                  <span>Offline</span>
+                </>
+              )}
             </span>
+
+            {cloudConfigured && onQuickCloudSync && (
+              <button
+                type="button"
+                onClick={onQuickCloudSync}
+                className="tactile-press hidden xl:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold border transition-colors hover:bg-[var(--bg-hover)]"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  borderColor: 'var(--border-hairline)',
+                  color: syncStatus === 'error' ? 'var(--danger)' : 'var(--accent)'
+                }}
+                title="Push Store Snapshot to Cloud"
+              >
+                <Cloud className={`w-3 h-3 ${syncStatus === 'syncing' ? 'animate-pulse' : ''}`} />
+                <span>{syncStatus === 'syncing' ? 'Syncing' : 'Cloud'}</span>
+              </button>
+            )}
           </div>
         </div>
 

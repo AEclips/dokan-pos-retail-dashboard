@@ -12,8 +12,12 @@ import {
   Trash2,
   AlertCircle,
   Crown,
-  User
+  User,
+  Cloud,
+  RefreshCw,
+  Copy
 } from 'lucide-react';
+import { CLOUD_SQL_SCHEMA } from '../../utils/cloudSync';
 import {
   getAllStaffAccounts,
   deleteStaffAccount,
@@ -24,6 +28,12 @@ import {
 export default function SettingsScreen({
   config,
   currentUser,
+  cloudConfig,
+  syncStatus,
+  isOnline = true,
+  onUpdateCloudConfig,
+  onCloudPush,
+  onCloudPull,
   onUpdateConfig,
   onExportBackup,
   onImportBackup,
@@ -46,6 +56,12 @@ export default function SettingsScreen({
   const [newStaffRole, setNewStaffRole] = useState('Staff');
   const [staffError, setStaffError] = useState(null);
   const [staffSuccess, setStaffSuccess] = useState(null);
+
+  const [supabaseUrl, setSupabaseUrl] = useState(cloudConfig?.supabaseUrl || '');
+  const [supabaseAnonKey, setSupabaseAnonKey] = useState(cloudConfig?.supabaseAnonKey || '');
+  const [storeId, setStoreId] = useState(cloudConfig?.storeId || 'main-store-01');
+  const [autoSync, setAutoSync] = useState(Boolean(cloudConfig?.autoSync));
+  const [copiedSql, setCopiedSql] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -458,6 +474,206 @@ export default function SettingsScreen({
           </div>
         </form>
       </div>
+
+      {/* Cloud Sync (Supabase Multi-Device) - Owner Only */}
+      {isUserOwner && onUpdateCloudConfig && (
+        <div className="pos-surface p-5 sm:p-6 space-y-4">
+          <div
+            className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b"
+            style={{ borderColor: 'var(--border-hairline)' }}
+          >
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-8 h-8 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: 'var(--accent-soft)', color: 'var(--accent)' }}
+              >
+                <Cloud className="w-4 h-4" strokeWidth={1.85} />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>
+                  Cloud Sync & Multi-Device Backup (Supabase)
+                </h3>
+                <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+                  Sync products, sales, dues, and settings across counter devices
+                </p>
+              </div>
+            </div>
+
+            <span
+              className="px-2.5 py-1 rounded-full text-[10.5px] font-mono font-semibold border"
+              style={{
+                backgroundColor: isOnline ? 'var(--accent-soft)' : 'var(--warning-soft)',
+                borderColor: isOnline ? 'rgba(16, 185, 129, 0.28)' : 'rgba(245, 158, 11, 0.3)',
+                color: isOnline ? 'var(--accent)' : 'var(--warning)'
+              }}
+            >
+              {isOnline ? (syncStatus === 'syncing' ? 'Syncing...' : 'Network Online') : 'Offline (Local Mode)'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div className="sm:col-span-2">
+              <label className="block font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>
+                Supabase Project URL
+              </label>
+              <input
+                type="url"
+                placeholder="https://your-project.supabase.co"
+                value={supabaseUrl}
+                onChange={(e) => setSupabaseUrl(e.target.value)}
+                className="pos-input w-full px-3 py-2 text-xs font-mono"
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>
+                Store ID
+              </label>
+              <input
+                type="text"
+                placeholder="main-store-01"
+                value={storeId}
+                onChange={(e) => setStoreId(e.target.value)}
+                className="pos-input w-full px-3 py-2 text-xs font-mono"
+              />
+            </div>
+
+            <div className="sm:col-span-3">
+              <label className="block font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>
+                Supabase Anon Public Key
+              </label>
+              <input
+                type="password"
+                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                value={supabaseAnonKey}
+                onChange={(e) => setSupabaseAnonKey(e.target.value)}
+                className="pos-input w-full px-3 py-2 text-xs font-mono"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-1 text-xs">
+            <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={autoSync}
+                onChange={(e) => setAutoSync(e.target.checked)}
+                className="rounded accent-emerald-500"
+              />
+              <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>
+                Auto-sync changes to cloud when online
+              </span>
+            </label>
+
+            {cloudConfig?.lastSyncedAt && (
+              <span className="text-[11px] font-mono" style={{ color: 'var(--text-muted)' }}>
+                Last synced: {new Date(cloudConfig.lastSyncedAt).toLocaleString()}
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() =>
+                onUpdateCloudConfig({
+                  ...cloudConfig,
+                  supabaseUrl: supabaseUrl.trim(),
+                  supabaseAnonKey: supabaseAnonKey.trim(),
+                  storeId: storeId.trim() || 'main-store-01',
+                  autoSync
+                })
+              }
+              className="tactile-press px-3.5 py-2 rounded-xl border text-xs font-semibold transition-colors hover:bg-[var(--bg-hover)]"
+              style={{
+                backgroundColor: 'var(--bg-subtle)',
+                borderColor: 'var(--border-hairline)',
+                color: 'var(--text-primary)'
+              }}
+            >
+              Save Cloud Config
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                onCloudPush &&
+                onCloudPush({
+                  ...cloudConfig,
+                  supabaseUrl: supabaseUrl.trim(),
+                  supabaseAnonKey: supabaseAnonKey.trim(),
+                  storeId: storeId.trim() || 'main-store-01',
+                  autoSync
+                })
+              }
+              disabled={!isOnline || syncStatus === 'syncing'}
+              className="tactile-press px-3.5 py-2 rounded-xl text-white text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40"
+              style={{ backgroundColor: 'var(--accent)' }}
+            >
+              <Upload className="w-3.5 h-3.5" />
+              <span>Push to Cloud</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                onCloudPull &&
+                onCloudPull({
+                  ...cloudConfig,
+                  supabaseUrl: supabaseUrl.trim(),
+                  supabaseAnonKey: supabaseAnonKey.trim(),
+                  storeId: storeId.trim() || 'main-store-01',
+                  autoSync
+                })
+              }
+              disabled={!isOnline || syncStatus === 'syncing'}
+              className="tactile-press px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 disabled:opacity-40 hover:bg-[var(--bg-hover)]"
+              style={{
+                backgroundColor: 'var(--bg-surface)',
+                borderColor: 'var(--border-hairline)',
+                color: 'var(--text-primary)'
+              }}
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Pull from Cloud</span>
+            </button>
+          </div>
+
+          <div
+            className="p-3 rounded-xl border space-y-1.5 text-[11px]"
+            style={{
+              backgroundColor: 'var(--bg-elevated)',
+              borderColor: 'var(--border-hairline)'
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                1-Step Supabase SQL Table Setup:
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(CLOUD_SQL_SCHEMA);
+                  setCopiedSql(true);
+                  setTimeout(() => setCopiedSql(false), 2000);
+                }}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-mono font-semibold"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  borderColor: 'var(--border-hairline)',
+                  color: copiedSql ? 'var(--accent)' : 'var(--text-secondary)'
+                }}
+              >
+                {copiedSql ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                <span>{copiedSql ? 'Copied' : 'Copy SQL'}</span>
+              </button>
+            </div>
+            <pre className="font-mono text-[10px] overflow-x-auto leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+              {CLOUD_SQL_SCHEMA}
+            </pre>
+          </div>
+        </div>
+      )}
 
       {/* Database Backup & Maintenance (Owner Only) */}
       {isUserOwner && (
